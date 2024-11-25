@@ -13,14 +13,19 @@ services:
     networks:
       - keycloak-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: '512M'
 
   auth:
-    image: quay.io/keycloak/keycloak:23.0.3
+    image: quay.io/keycloak/keycloak:26.0.6
     ports:
       - "9990:8080"
       - "9991:8443"
@@ -55,6 +60,11 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: '1024M'
 
 networks:
   keycloak-network:
@@ -62,6 +72,4 @@ networks:
 
 volumes:
   postgres_data:
-    driver: local
   keycloak_data:
-    driver: local
